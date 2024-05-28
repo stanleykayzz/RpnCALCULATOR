@@ -12,7 +12,7 @@ namespace WebApplication1.Controllers
     public class RpnController : ControllerBase
     {
         //context static car il n'y a pas de source de données externe
-        private static readonly NpmCalculatorContext _context = new NpmCalculatorContext();
+        private static readonly RpnCalculatorContext _context = new RpnCalculatorContext();
         private readonly ICalculator _calculatorRepository;
 
         public RpnController()
