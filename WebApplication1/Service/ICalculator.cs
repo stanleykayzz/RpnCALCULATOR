@@ -5,7 +5,7 @@ namespace WebApplication1.Service
 {
     public interface ICalculator
     {
-        List<string> GetOperands();
+        List<char> GetOperands();
         List<Stack<double>> GetStacks();
         Stack<double> FindStack(int stackId);
         void DeleteStack(int stackId);

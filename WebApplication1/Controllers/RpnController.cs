@@ -23,7 +23,7 @@ namespace WebApplication1.Controllers
         #region GET
 
         [HttpGet("op")]
-        public List<string> GetOperands()
+        public List<char> GetOperands()
         {
             return _calculatorRepository.GetOperands();
         }

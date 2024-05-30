@@ -1,5 +1,7 @@
 ﻿using WebApplication1.DbContext;
+using WebApplication1.Models;
 using WebApplication1.Service;
+using static WebApplication1.Models.RpnCalculator;
 
 namespace WebApplication1.Repository
 {
@@ -34,9 +36,16 @@ namespace WebApplication1.Repository
             return _context.RpnCalculator.stacks.ElementAt(stackId - 1);
         }
 
-        public List<string> GetOperands()
+        public List<char> GetOperands()
         {
-            return _context.RpnCalculator.operandList.ToList();
+            List<char> operatorList = new List<char>();
+
+            foreach (var op in Enum.GetValues(typeof(RpnCalculator.Operators)))
+            {
+                operatorList.Add((char)op);
+            }
+            
+            return operatorList;
         }
 
         public List<Stack<double>> GetStacks()
