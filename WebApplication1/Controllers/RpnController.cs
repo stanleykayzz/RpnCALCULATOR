@@ -20,6 +20,11 @@ namespace WebApplication1.Controllers
             _calculatorRepository = new CalculatorRepository(_context);
         }
 
+        public RpnController(ICalculator calculatorRepository)
+        {
+            _calculatorRepository = calculatorRepository;
+        }
+
         #region GET
         /// <summary>
         /// Get All Operators
@@ -28,7 +33,7 @@ namespace WebApplication1.Controllers
         [HttpGet("operators")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<char> GetOperands()
+        public ActionResult<IEnumerable<char>> GetOperands()
         {
             try
             {
@@ -82,7 +87,7 @@ namespace WebApplication1.Controllers
 
                 return (result != null) ? Ok(new { result }) : BadRequest(new { Error = result });
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { ErrorMessage = "Matching stack not found." });
             }
