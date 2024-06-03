@@ -1,19 +1,19 @@
-﻿using WebApplication1.DbContext;
-using WebApplication1.Models;
+﻿using System.Net;
+using WebApplication1.DbContext;
 using WebApplication1.Service;
-using static WebApplication1.Models.RpnCalculator;
+using RpnCalculator.Utils;
 
 namespace WebApplication1.Repository
 {
     public class CalculatorRepository : ICalculator
     {
-        public readonly RpnCalculatorContext _context;
+        public RpnCalculatorContext _context;
 
         public CalculatorRepository(RpnCalculatorContext context)
         {
             _context = context;
         }
-        
+
         /// <summary>
         /// Add a new value to Stack matching id
         /// </summary>
@@ -53,17 +53,9 @@ namespace WebApplication1.Repository
         /// <returns></returns>
         public IEnumerable<Stack<double>> DeleteStack(int stackId)
         {
-            try
-            {
-                _context.RpnCalculator.dictionnary.Remove(stackId);
+            _context.RpnCalculator.dictionnary.Remove(stackId);
 
-                return (IEnumerable<Stack<double>>) _context.RpnCalculator.dictionnary.ToList();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
+            return _context.RpnCalculator.dictionnary.Values;
         }
 
         /// <summary>
@@ -73,14 +65,7 @@ namespace WebApplication1.Repository
         /// <returns></returns>
         public Stack<double> FindStack(int stackId)
         {
-            try
-            {
-                return  _context.RpnCalculator.dictionnary[stackId];
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return _context.RpnCalculator.dictionnary[stackId];
         }
 
         /// <summary>
@@ -89,12 +74,12 @@ namespace WebApplication1.Repository
         /// <returns></returns>
         public IEnumerable<char> GetOperands()
         {
-            foreach (Operators op in Enum.GetValues(typeof(RpnCalculator.Operators)))
+            foreach (Utils.Operators op in Enum.GetValues(typeof(Utils.Operators)))
             {
                 yield return (char)op;
             }
         }
-        
+
         /// <summary>
         /// get all stacks
         /// </summary>
@@ -113,25 +98,30 @@ namespace WebApplication1.Repository
         /// <exception cref="InvalidOperationException"></exception>
         public IEnumerable<double> OperateStack(char op, int stackId)
         {
-            var selectedStack = FindStack(stackId);
-            
-            if (selectedStack.Count < 2)
+            if (!GetOperands().Contains(op))
             {
-                throw new InvalidOperationException("La pile doit contenir au moins deux éléments pour effectuer l'opération.");
+                throw new InvalidOperationException("Unknown operator.");
             }
 
-            var values = selectedStack.Take(2).ToArray();
+            var selectedStack = FindStack(stackId);
+
+            if (selectedStack.Count < 2)
+            {
+                throw new InvalidOperationException("Stack must contains at least 2 values to operate.");
+            }
+
+            var value1 = selectedStack.Pop();
+            var value2 = selectedStack.Pop();
+            
             var result = op switch
             {
-                '+' => values[0] + values[1],
-                '-' => values[0] - values[1],
-                '*' => values[0] * values[1],
-                '/' => values[0] / values[1],
-                _ => throw new InvalidOperationException("Opération non reconnue")
+                '+' => value2 + value1,
+                '-' => value2 - value1,
+                '*' => value2 * value1,
+                '/' => value2 / value1,
+                _ => throw new NotImplementedException()
             };
 
-            selectedStack.Pop();
-            selectedStack.Pop();
             selectedStack.Push(result);
 
             return selectedStack;

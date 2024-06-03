@@ -4,11 +4,12 @@ namespace WebApplication1.DbContext
 {
     public class RpnCalculatorContext
     {
-        public RpnCalculator RpnCalculator { get; set; }
+        public WebApplication1.Models.RpnCalculator RpnCalculator { get; set; }
+
 
         public RpnCalculatorContext()
         {
-            RpnCalculator = new RpnCalculator();
+            RpnCalculator = new WebApplication1.Models.RpnCalculator();
         }
     }
 }

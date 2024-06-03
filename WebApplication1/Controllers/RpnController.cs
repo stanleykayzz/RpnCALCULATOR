@@ -21,11 +21,26 @@ namespace WebApplication1.Controllers
         }
 
         #region GET
-
-        [HttpGet("op")]
-        public IEnumerable<char> GetOperands()
+        /// <summary>
+        /// Get All Operators
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("operators")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<char> GetOperands()
         {
-            return _calculatorRepository.GetOperands();
+            try
+            {
+                var result = _calculatorRepository.GetOperands();
+
+                return (result != null) ? Ok(new { result }) : BadRequest(new { Error = result });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { ErrorMessage = e.Message });
+            }
+
         }
 
         /// <summary>
@@ -33,9 +48,21 @@ namespace WebApplication1.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("stack")]
-        public IEnumerable<Stack<double>> GetStacks()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<Stack<double>> GetStacks()
         {
-            return _calculatorRepository.GetStacks();
+            try
+            {
+                var result = _calculatorRepository.GetStacks();
+
+                return (result != null) ? Ok(new { result }) : BadRequest(new { Error = result });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { ErrorMessage = e.Message });
+            }
         }
 
         /// <summary>
@@ -44,9 +71,21 @@ namespace WebApplication1.Controllers
         /// <param name="stackId"></param>
         /// <returns></returns>
         [HttpGet("stack/{stackId}")]
-        public Stack<double> FindStack([FromQuery] int stackId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<Stack<double>> FindStack(int stackId)
         {
-            return _calculatorRepository.FindStack(stackId);
+            try
+            {
+                var result = _calculatorRepository.FindStack(stackId);
+
+                return (result != null) ? Ok(new { result }) : BadRequest(new { Error = result });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { ErrorMessage = "Matching stack not found." });
+            }
         }
         #endregion
 
@@ -58,11 +97,20 @@ namespace WebApplication1.Controllers
         /// <returns></returns>
         [HttpPost("stack")]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult CreateStack()
         {
-            int result = _calculatorRepository.CreateStack();
-            return (result > 0)? Ok(new { StackCreatedId = result }) : BadRequest(new { NotCreated = result });
+            try
+            {
+                int result = _calculatorRepository.CreateStack();
+
+                return (result > 0) ? Ok(new { StackCreatedId = result }) : BadRequest(new { Error = result });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { ErrorMessage = e.Message });
+            }
         }
 
         /// <summary>
@@ -72,10 +120,21 @@ namespace WebApplication1.Controllers
         /// <param name="value"></param>
         /// <returns></returns>
         [HttpPost("stack/{stackId}/{value}")]
-        public IActionResult AddValue([FromQuery] int stackId, [FromQuery] double value)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult AddValue(int stackId, double value)
         {
-            _calculatorRepository.AddValue(stackId, value);
-            return Ok();
+            try
+            {
+                var result = _calculatorRepository.AddValue(stackId, value);
+
+                return (result != null) ? Ok(new { UpdatedStack = result }) : BadRequest(new { Error = result });
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { ErrorMessage = "Values can't be added to unknown stack." });
+            }
         }
 
         /// <summary>
@@ -85,10 +144,21 @@ namespace WebApplication1.Controllers
         /// <param name="stackId"></param>
         /// <returns></returns>
         [HttpPost("op/{op}/stack/{stackId}")]
-        public IActionResult OperateStack([FromQuery] char op, [FromQuery] int stackId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult OperateStack(char op, int stackId)
         {
-            _calculatorRepository.OperateStack(op, stackId);
-            return Ok();
+            try
+            {
+                var result = _calculatorRepository.OperateStack(op, stackId);
+
+                return (result != null) ? Ok(new { OperatedStack = result }) : BadRequest(new { Error = result });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { ErrorMessage = e.Message });
+            }
         }
         #endregion
 
@@ -99,10 +169,21 @@ namespace WebApplication1.Controllers
         /// <param name="stackId"></param>
         /// <returns></returns>
         [HttpDelete("stack/{stackId}")]
-        public IActionResult DeleteStack([FromQuery] int stackId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult DeleteStack(int stackId)
         {
-            _calculatorRepository.DeleteStack(stackId);
-            return Ok();
+            try
+            {
+                var result = _calculatorRepository.DeleteStack(stackId);
+
+                return (result != null) ? Ok(new { Stacks = result }) : BadRequest(new { Error = result });
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { ErrorMessage = "There are no stacks to delete." });
+            }
         }
         #endregion
 
