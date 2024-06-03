@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 using WebApplication1.DbContext;
 using WebApplication1.Models;
@@ -101,7 +102,7 @@ namespace WebApplication1.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("stack")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult CreateStack()
@@ -109,7 +110,7 @@ namespace WebApplication1.Controllers
             try
             {
                 int result = _calculatorRepository.CreateStack();
-
+                
                 return (result > 0) ? Ok(new { StackCreatedId = result }) : BadRequest(new { Error = result });
             }
             catch (Exception e)
