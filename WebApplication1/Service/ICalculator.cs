@@ -5,12 +5,12 @@ namespace WebApplication1.Service
 {
     public interface ICalculator
     {
-        List<char> GetOperands();
-        List<Stack<double>> GetStacks();
+        IEnumerable<char> GetOperands();
+        IEnumerable<Stack<double>> GetStacks();
         Stack<double> FindStack(int stackId);
-        void DeleteStack(int stackId);
-        void CreateStack();
-        void AddValue(int stackId, double value);
-        void OperateStack(string op, int stackId);
+        IEnumerable<Stack<double>> DeleteStack(int stackId);
+        int CreateStack();
+        IEnumerable<double> AddValue(int stackId, double value);
+        IEnumerable<double> OperateStack(char op, int stackId);
     }
 }
