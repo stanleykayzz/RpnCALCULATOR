@@ -13,49 +13,108 @@ namespace WebApplication1.Repository
         {
             _context = context;
         }
-        public void AddValue(int stackId, double value)
+        
+        /// <summary>
+        /// Add a new value to Stack matching id
+        /// </summary>
+        /// <param name="stackId"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public IEnumerable<double> AddValue(int stackId, double value)
         {
-            _context.RpnCalculator.stacks.ElementAt(stackId - 1).Push(value);
+            _context.RpnCalculator.dictionnary[stackId].Push(value);
+
+            return _context.RpnCalculator.dictionnary[stackId];
         }
 
-        public void CreateStack()
+        /// <summary>
+        /// Creating a new stack
+        /// </summary>
+        /// <returns></returns>
+        public int CreateStack()
         {
-            _context.RpnCalculator.stacks.Add(new Stack<double>());
+            try
+            {
+                int index = _context.RpnCalculator.indexCounter += 1;
+                _context.RpnCalculator.dictionnary.Add(index, new Stack<double>());
+
+                return index;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
         }
 
-        public void DeleteStack(int stackId)
+        /// <summary>
+        /// Delete a stack matching the id
+        /// </summary>
+        /// <param name="stackId"></param>
+        /// <returns></returns>
+        public IEnumerable<Stack<double>> DeleteStack(int stackId)
         {
-            //_context.NpmCalculator.stacks.RemoveAt(stackId - 1);
-            _context.RpnCalculator.stacks = _context.RpnCalculator.stacks
-                .Where((stack, index) => index != stackId - 1)
-                .ToList();
+            try
+            {
+                _context.RpnCalculator.dictionnary.Remove(stackId);
+
+                return (IEnumerable<Stack<double>>) _context.RpnCalculator.dictionnary.ToList();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
         }
 
+        /// <summary>
+        /// return a stack matching the id
+        /// </summary>
+        /// <param name="stackId"></param>
+        /// <returns></returns>
         public Stack<double> FindStack(int stackId)
         {
-            return _context.RpnCalculator.stacks.ElementAt(stackId - 1);
-        }
-
-        public List<char> GetOperands()
-        {
-            List<char> operatorList = new List<char>();
-
-            foreach (var op in Enum.GetValues(typeof(RpnCalculator.Operators)))
+            try
             {
-                operatorList.Add((char)op);
+                return  _context.RpnCalculator.dictionnary[stackId];
             }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Returning all enumerator values as IEnumerable<char>
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<char> GetOperands()
+        {
+            foreach (Operators op in Enum.GetValues(typeof(RpnCalculator.Operators)))
+            {
+                yield return (char)op;
+            }
+        }
+        
+        /// <summary>
+        /// get all stacks
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Stack<double>> GetStacks()
+        {
+            return _context.RpnCalculator.dictionnary.Values;
+        }
+
+        /// <summary>
+        /// Apply operation to Stack
+        /// </summary>
+        /// <param name="op"></param>
+        /// <param name="stackId"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public IEnumerable<double> OperateStack(char op, int stackId)
+        {
+            var selectedStack = FindStack(stackId);
             
-            return operatorList;
-        }
-
-        public List<Stack<double>> GetStacks()
-        {
-            return _context.RpnCalculator.stacks.ToList();
-        }
-
-        public void OperateStack(string op, int stackId)
-        {
-            var selectedStack = _context.RpnCalculator.stacks.ElementAt(stackId - 1);
             if (selectedStack.Count < 2)
             {
                 throw new InvalidOperationException("La pile doit contenir au moins deux éléments pour effectuer l'opération.");
@@ -64,17 +123,18 @@ namespace WebApplication1.Repository
             var values = selectedStack.Take(2).ToArray();
             var result = op switch
             {
-                "+" => values[0] + values[1],
-                "-" => values[0] - values[1],
-                "*" => values[0] * values[1],
-                "/" => values[0] / values[1],
+                '+' => values[0] + values[1],
+                '-' => values[0] - values[1],
+                '*' => values[0] * values[1],
+                '/' => values[0] / values[1],
                 _ => throw new InvalidOperationException("Opération non reconnue")
             };
 
             selectedStack.Pop();
             selectedStack.Pop();
-
             selectedStack.Push(result);
+
+            return selectedStack;
         }
     }
 }
